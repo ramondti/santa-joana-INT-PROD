@@ -17,7 +17,7 @@ export class FindResourceEncounter {
       ID_SUMARIO_INTERNACAO,
       CPF,
       CD_PACIENTE,
-      NOMEMEDICO,
+      PROFISSIONAL_ALTA_MEDICA,
       NOME_PROFISSIONAL,
       (SELECT nr_cgc FROM convenio WHERE cd_convenio =  (SELECT cd_convenio FROM atendime WHERE cd_Atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento)) AS CNPJ,
       numero_registro AS CRM,
@@ -87,7 +87,7 @@ export class FindResourceEncounter {
             individual: {
               reference: `Practitioner/${queryResource[0].CD_PRESTADOR_ALTA_MEDICA}`,
               type: "Practitioner",
-              display: `${queryResource[0].NOMEMEDICO}`,
+              display: `${queryResource[0].PROFISSIONAL_ALTA_MEDICA}`,
             },
           },
         ],
