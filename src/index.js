@@ -18,8 +18,8 @@ app.get("/santa-joana", async (req, res) => {
   return res.json(json);
 });
 
-app.listen(9292, (err, data) => {
-  console.log("Ouvindo na porta 9292");
+app.listen(9595, (err, data) => {
+  console.log("Ouvindo na porta 9595 ### INTERNAÇÃO PROD");
 });
 
 export default app;
