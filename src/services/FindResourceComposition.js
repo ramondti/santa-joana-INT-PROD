@@ -20,6 +20,7 @@ export class FindResourceComposition {
        END
        FROM atendime
        WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento ) ||'-'|| cd_atendimento as id,
+       (SELECT ds_razao_social FROM multi_empresas WHERE cd_multi_empresa =(SELECT cd_multi_empresa FROM atendime WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento)) DS_RAZAO_SOCIAL,
     To_Char(data_hora_atendimento, 'YYYY-MM-DD') AS data 
     FROM DBI_FHIR_SUMARIO_INTERNACAO
     WHERE id_sumario_internacao = ${idSumarioIntegracao} 
@@ -37,7 +38,7 @@ export class FindResourceComposition {
           {
             type: "Organization",
             reference: `Organization/${queryResource[0].ID}`,
-            display: `${queryResource[0].DISPLAY}`,
+            display: `${queryResource[0].DS_RAZAO_SOCIAL}`,
           },
         ],
         date: queryResource[0].DATA,

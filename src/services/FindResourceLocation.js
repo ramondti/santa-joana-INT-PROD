@@ -12,7 +12,7 @@ export class FindResourceLocation {
       FROM atendime
       WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento ) AS id,       
     CNES,
-    (SELECT ds_multi_empresa FROM multi_empresas WHERE cd_multi_empresa = (SELECT cd_multi_empresa FROM atendime WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento )) AS hospital
+    (SELECT ds_razao_social FROM multi_empresas WHERE cd_multi_empresa = (SELECT cd_multi_empresa FROM atendime WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento )) AS hospital
    FROM DBI_FHIR_SUMARIO_INTERNACAO
    WHERE id_sumario_internacao = ${idSumarioIntegracao} 
 

@@ -11,6 +11,7 @@ export class FindResourceOrganization {
     END
     FROM atendime
     WHERE cd_atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento ) ||'-'|| cd_atendimento AS id, 
+    (SELECT nm_convenio FROM convenio WHERE cd_convenio = (SELECT cd_convenio FROM atendime WHERE cd_Atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento)) NM_CONVENIO,
     (SELECT nr_cgc FROM convenio WHERE cd_convenio =  (SELECT cd_convenio FROM atendime WHERE cd_Atendimento = DBI_FHIR_SUMARIO_INTERNACAO.cd_atendimento)) AS CNPJ
     FROM DBI_FHIR_SUMARIO_INTERNACAO
    WHERE id_sumario_internacao = ${idSumarioIntegracao} 
@@ -30,7 +31,7 @@ export class FindResourceOrganization {
         ],
         type: [
           {
-            text: "CONVENIO",
+            text: `${queryResource[0].NM_CONVENIO}`,
           },
         ],
       },
