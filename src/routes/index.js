@@ -1,5 +1,4 @@
 import knex from "../database/db";
-import axios from "axios";
 import { readSync } from "fs";
 const { v4: uuidv4 } = require("uuid");
 import { FindResourceComposition } from "../services/FindResourceComposition";
@@ -15,8 +14,7 @@ import { FindResourceCondition2 } from "../services/FindResourceCondition2";
 import { FindResourceEncounter } from "../services/FindResourceEncounter";
 import { FindResourceMedicationRequest } from "../services/FindResourceMedicationRequest";
 import { FindResourceProcedure } from "../services/FindResourceProcedure";
-
-FindResourceAllergyIntolerance;
+import api from "../services/api";
 
 export async function getSantaJoana() {
   try {
@@ -34,8 +32,6 @@ export async function getSantaJoana() {
     const findResourceEncounter = new FindResourceEncounter();
     const findResourceMedicationRequest = new FindResourceMedicationRequest();
     const findResourceProcedure = new FindResourceProcedure();
-
-    const URL_SANTA_JOANA = process.env.URL_SANTA_JOANA;
 
     const newId = uuidv4();
     const newId2 = uuidv4();
@@ -183,24 +179,30 @@ export async function getSantaJoana() {
         )
       );
 
-      await knex.raw(
-        `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
-          SET sn_status = 'S' 
-         WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
-      );
-
-      const response = await axios.put(
-        `${URL_SANTA_JOANA}${bundle.ID}`,
-        result,
-        {
+      try {
+        const response = await api.put(`${bundle.ID}`, result, {
           headers: {
             "Content-Type": "application/json",
           },
-        }
-      );
+        });
 
-      console.log("### Envio PUT ### INTERNAÇÃO PROD -> ", response.status);
-      console.log("### PROCESSO ENCERRADO ### INTERNAÇÃO PROD");
+        console.log("### Envio PUT ### INTERNAÇÃO PROD -> ", response.status);
+        console.log("### PROCESSO ENCERRADO ### INTERNAÇÃO PROD");
+
+        await knex.raw(
+          `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
+            SET sn_status = 'S' 
+           WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
+        );
+      } catch (error) {
+        await knex.raw(
+          `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
+            SET sn_status = 'N' 
+           WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
+        );
+        console.log("### Setou para N")
+        console.log(response.status);
+      }
 
       return result;
     }
@@ -218,23 +220,34 @@ export async function getSantaJoana() {
       )
     );
 
-    await knex.raw(
-      `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
-        SET sn_status = 'S' 
-       WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
-    );
+    try {
+      const response = await api.put(`/${bundle.ID}`, result, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    const response = await axios.put(`${URL_SANTA_JOANA}${bundle.ID}`, result, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      console.log("### Envio PUT ### INTERNAÇÃO PROD -> ", response.status);
+      console.log("### PROCESSO ENCERRADO ### INTERNAÇÃO PROD");
 
-    console.log("### Envio PUT ### INTERNAÇÃO PROD -> ", response.status);
+      await knex.raw(
+        `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
+          SET sn_status = 'S' 
+         WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
+      );
+    } catch (error) {
+     
+      await knex.raw(
+        `UPDATE DBINTEGRA.DBI_FHIR_SUMARIO_INTERNACAO 
+          SET sn_status = 'N' 
+         WHERE id_sumario_internacao = ${sumarioInternacao.ID_SUMARIO_INTERNACAO} `
+      );
+      console.log("### Setou para N")
+      console.log(error);
+    }
 
-    console.log("### PROCESSO ENCERRADO ###");
     return result;
   } catch (error) {
-    return console.log(error);
+    console.log(response.status);
   }
 }
